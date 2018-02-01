@@ -32,15 +32,14 @@ if (argc == 2){
 void user_prompt(){
 	char input[512];
 	int	online = 1;
-	stringtokens = strtok(str," \t |<>&;");
-While(Online == 1)
+While(online == 1)
 	Printf("Enter your input here:\n")
 	fgets(input);
-	Switch(input)
-		Case 'command':
+	switch(input)
+		case 'command':
 			printf("This Will be a command run by the shell");
 			break;
-		Case 'Exit':
+		case 'Exit':
 			online = 0;
 			break;
 		default:
