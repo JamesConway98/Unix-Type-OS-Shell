@@ -1,0 +1,17 @@
+void user_prompt(){
+	char input[512];
+	int	online = 1;
+While(Online == 1)
+	Printf("Enter your input here:\n")
+	fgets(input);
+	Switch(input)
+		Case 'command':
+			printf("This Will be a command run by the shell");
+			break;
+		Case 'Exit':
+			online = 0;
+			break;
+		default:
+			Printf("This is not a valid command")
+
+}
