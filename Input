@@ -4,7 +4,7 @@ if (argc == 2){
 	if(!strcmp(argv[1],"-f"))
 		readFile();
 	else if (!strcmp(argv[1], "-c"))
-		readConsole();
+		user_prompt();
     }
     
     else if (argc > 2)
