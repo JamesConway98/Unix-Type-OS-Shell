@@ -6,6 +6,7 @@ void shell_loop();
 int find_command(char []);
 
 int running = 0;
+char tkarray[12][120];
 
 
 void main(){
@@ -18,17 +19,25 @@ void shell_loop(){
 
     while(running == 0){
     	printf(":) ");
-	    getInput();
-	    find_command();
+	getInput();
+	find_command(tkarray[0]);
     }   
 
 }
 
 
-char getInput(){
+void getInput(){
 
 char input[512];
 char * token;
+int nt = 0;
+
+for(int i = 0; i<12; i++){
+	for(int j = 0; j < 120; j++)
+		{
+		tkarray[i][j] = '\0';
+		}
+	}
 
 fgets(input, 512, stdin);
 input[strlen(input)-1] = '\0';
@@ -38,9 +47,10 @@ token = strtok (input, " ,.");
 
 	while (token != NULL){
 		printf("'%s' \n", token);
+		strcpy(tkarray, token);
 		token = strtok (NULL, " ,.");
+		nt++;
 }
-
 
 }
 
@@ -48,13 +58,15 @@ int find_command(char c[120]){
 
 	
 if(strncmp("exit", c, 4) == 0){
-	
 		running = 1;
 		return 0;		
 
 	}
+else if(strncmp("",c,1) == 0){
+	running = 1;
+	return 0;
+}
 else if(strncmp("cd", c, 2) == 0){
-	
 		return 1;		
 
 	}
