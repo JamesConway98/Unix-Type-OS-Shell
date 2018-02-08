@@ -3,6 +3,9 @@
 
 void getInput();
 void shell_loop();
+int find_command(char []);
+
+int running = 0;
 
 
 void main(){
@@ -13,20 +16,16 @@ void main(){
 
 void shell_loop(){
 
-int exitProg = 0;
-
-
-/*do{*/
-	printf(":) ");
-	getInput();
-
-
-/*}while(exitProg == FALSE);*/
+    while(running == 0){
+    	printf(":) ");
+	    getInput();
+	    find_command();
+    }   
 
 }
 
 
-void getInput(){
+char getInput(){
 
 char input[512];
 char * token;
@@ -41,6 +40,38 @@ token = strtok (input, " ,.");
 		printf("'%s' \n", token);
 		token = strtok (NULL, " ,.");
 }
+
+
+}
+
+int find_command(char c[120]){
+
+	
+if(strncmp("exit", c, 4) == 0){
+	
+		running = 1;
+		return 0;		
+
+	}
+else if(strncmp("cd", c, 2) == 0){
+	
+		return 1;		
+
+	}
+else if(strncmp("getpath", c, 7) == 0){
+	
+		return 2;	
+
+	}
+
+else if(strncmp("setpath", c, 7) == 0){
+	
+		return 3;		
+
+	}
+	
+	return 0;
+
 
 
 }
