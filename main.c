@@ -39,15 +39,15 @@ for(int i = 0; i<12; i++){
 		}
 	}
 
-fgets(input, 512, stdin);
-input[strlen(input)-1] = '\0';
+	fgets(input, 512, stdin);
+	input[strlen(input)-1] = '\0';
 
-printf("splitting string %s into tokens: \n", input);
-token = strtok (input, " ,.");
+	printf("splitting string %s into tokens: \n", input);
+	token = strtok (input, " ,.");
 
 	while (token != NULL){
 		printf("'%s' \n", token);
-		strcpy(tkarray, token);
+		strcpy(tkarray[nt], token);
 		token = strtok (NULL, " ,.");
 		nt++;
 }
@@ -62,11 +62,11 @@ if(strncmp("exit", c, 4) == 0){
 		return 0;		
 
 	}
-else if(strncmp("",c,1) == 0){
+else if(strncmp("<ctrl>-D", c, 8) == 0){
 	running = 1;
 	return 0;
 }
-else if(strncmp("cd", c, 2) == 0){
+else if(strncmp("fork", c, 2) == 0){
 		return 1;		
 
 	}
