@@ -57,7 +57,7 @@ for(int i = 0; i<12; i++){
 int find_command(char c[120]){
 
 	
-if(strncmp("exit", c, 4) == 0){
+if(strncmp("exit", c, 5) == 0){
 		running = 1;
 		return 0;		
 
