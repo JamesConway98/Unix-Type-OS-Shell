@@ -39,7 +39,9 @@ for(int i = 0; i<12; i++){
 		}
 	}
 
-	fgets(input, 512, stdin);
+		if(fgets(input, 512, stdin) == NULL){
+		running = 1;
+}
 	input[strlen(input)-1] = '\0';
 
 	printf("splitting string %s into tokens: \n", input);
@@ -62,10 +64,7 @@ if(strncmp("exit", c, 5) == 0){
 		return 0;		
 
 	}
-else if(strncmp("<ctrl>-D", c, 8) == 0){
-	running = 1;
-	return 0;
-}
+
 else if(strncmp("fork", c, 2) == 0){
 		return 1;		
 
