@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h> 
 
 void getInput();
 void shell_loop();
 int find_command(char []);
+void fork_command();
 
 int running = 0;
 char tkarray[12][120];
@@ -84,5 +89,27 @@ else if(strncmp("setpath", c, 7) == 0){
 	return 0;
 
 
+
+}
+
+void fork_command(){
+
+pid_t pid;
+
+pid = fork();
+
+if(pid < 0) {
+	fprintf(stderr, "Fork Failed");
+}
+
+else if (pid == 0)
+	execlp("", , NULL); //this line is incomplete. the first 2 paramaters should be user inputted commands
+
+
+else if(pid > 0){
+	wait(NULL);
+	printf("Child Complete\n");
+
+}
 
 }
