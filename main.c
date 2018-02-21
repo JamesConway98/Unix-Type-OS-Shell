@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h> 
 
 void getInput();
 void shell_loop();
 int find_command(char []);
+void fork_command();
 
 int running = 0;
 char *tkarray[512];
@@ -71,7 +76,35 @@ if(strcmp(tkarray[0], "exit") == 0){
 		printf("P error\n");		
 
 	}
-} 
 }
 
+if(strcmp(tkarray[0], "fork") == 0){
+	fork_command();
+	}
+
+}
+
+void fork_command(){
+
+pid_t pid;
+
+pid = fork();
+
+if(pid < 0) {
+	fprintf(stderr, "Fork Failed");
+}
+
+else if(pid == 0){
+	execlp(tkarray[1], "ls", NULL);
+	printf("Fork command was unsuccessful\n"); //this line is only executed if the fork instructions are not carried out
+	exit(EXIT_FAILURE);
+}
+
+else if(pid > 0){
+	wait(NULL);
+	printf("Child Complete\n");
+
+}
+
+}
 
