@@ -78,7 +78,7 @@ if(strcmp(tkarray[0], "exit") == 0){
 	}
 }
 
-if(strcmp(tkarray[0], "fork") == 0){
+else{
 	fork_command();
 	}
 
@@ -95,7 +95,7 @@ if(pid < 0) {
 }
 
 else if(pid == 0){
-	execlp(tkarray[1], "ls", NULL);
+	execlp(tkarray[0], "ls", NULL);
 	printf("Fork command was unsuccessful\n"); //this line is only executed if the fork instructions are not carried out
 	exit(EXIT_FAILURE);
 }
