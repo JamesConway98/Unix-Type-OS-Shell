@@ -25,7 +25,6 @@ void shell_loop(){
     while(running == 0){
     	printf(":) ");
 	getInput();
-	/*find_command(*tkarray);*/
     }   
 
 }
@@ -73,7 +72,7 @@ if(strcmp(tkarray[0], "exit") == 0){
 		running = 1;
 	}else{
 		
-		printf("P error\n");		
+		printf("Error: exit command doesn't take parameters\n");		
 
 	}
 }
@@ -96,7 +95,8 @@ if(pid < 0) {
 
 else if(pid == 0){
 	execlp(tkarray[0], "ls", NULL);
-	printf("Fork command was unsuccessful\n"); //this line is only executed if the fork instructions are not carried out
+	//only executed if the above line isn't successful
+	perror("Error"); 
 	exit(EXIT_FAILURE);
 }
 
