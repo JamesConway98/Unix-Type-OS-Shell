@@ -32,13 +32,13 @@ void shell_loop(){
 
 void getInput(){
 
-char input[512];
-char *token;
-int nt = 0;
+	char input[512];
+	char *token;
+	int nt = 0;
 
-for(int i = 0; i<512; i++){
-		tkarray[i] = '\0';
-		}
+	for(int i = 0; i<512; i++){
+			tkarray[i] = '\0';
+	}
 
 	if(fgets(input, 512, stdin) == NULL) {
 		printf("\n");
@@ -48,9 +48,6 @@ for(int i = 0; i<512; i++){
 
 	input[strlen(input)-1] = '\0';
 
-	
-	
-	
 	token = strtok (input, " |><&;\t\n");
 
 	if (token == NULL){
@@ -60,26 +57,42 @@ for(int i = 0; i<512; i++){
 	while (token != NULL){
 		printf("'%s' \n", token);
 		tkarray[nt] = token;
-		
+			
 		token = strtok (NULL, " |><&;\t\n");
 		nt++;
-}
+	}
 	tkarray[nt] = NULL;
 
 
-if(strcmp(tkarray[0], "exit") == 0){
-	if(nt == 1){
-		running = 1;
-	}else{
+	if(strcmp(tkarray[0], "exit") == 0){
 		
-		printf("Error: exit command doesn't take parameters\n");		
+		if(nt == 1){
+			running = 1;
+		}else{
+			
+			printf("Error: exit command doesn't take parameters\n");		
 
+		}
 	}
-}
 
-else{
-	fork_command();
+	else if(strcmp(tkarray[0], "cd") == 0){
+		
+		if(nt == 2){
+			chdir(tkarray[1]);
+			printf("Changing dir\n");		
+		}else if(nt == 1){
+			
+			chdir(getenv("HOME"));
+
+		}else{
+			printf("Error: cd takes 1 argument\n");	
+			
+		}
 	}
+
+	else{
+		fork_command();
+		}
 
 }
 
@@ -107,4 +120,5 @@ else if(pid > 0){
 }
 
 }
+
 
