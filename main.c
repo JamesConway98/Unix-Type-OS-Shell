@@ -22,6 +22,8 @@ void main(){
 
 void shell_loop(){
 
+    chdir(getenv("HOME"));
+
     while(running == 0){
     	printf(":) ");
 	getInput();
