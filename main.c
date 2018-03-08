@@ -34,6 +34,25 @@ void shell_loop(){
 
 }
 
+void setpath(char *dir) {
+	char *oldpath = getenv("PATH");
+	setenv("PATH", dir, 1);
+	char *path = getenv("PATH");
+	if (strcmp(dir, path) == 0) {
+		printf("%s \n", path);
+	}
+	else {
+		printf("Re-pathing has failed, please try again");
+		setenv("PATH", oldpath, 1);
+	}
+	chdir(getenv("PATH"));
+}
+
+void getpath() {
+	char *path = getenv("PATH");
+	printf("%s \n", path);
+}
+
 
 void getInput(){
 
@@ -96,11 +115,21 @@ void getInput(){
 	}
 
 	else if (strcmp(tkarray[0], "getpath") == 0){
-		getpath();
+		if (nt == 1) {
+			getpath();
+		}
+		else {
+			printf("Getpath does not require any parameters, please try again \n");
+		}
 	}
 
 	else if (strcmp(tkarray[0], "setpath") == 0){
-		setpath(tkarray[1]);
+		if (nt ==2) {
+			setpath(tkarray[1]);
+		}
+		else if (nt != 2) {
+			printf("Setpath requires one parameter, please try again. \n");
+		}
 	}
 
 	else{
@@ -128,30 +157,7 @@ else if(pid == 0){
 
 else if(pid > 0){
 	wait(NULL);
-	printf("Child Complete\n");
 
 }
 
-void setpath(char *dir) {
-	char *oldpath = getenv("PATH");
-	setenv("PATH", dir, 1);
-	char *path = getenv("PATH");
-	if (strcmp(dir, path) == 0) {
-		printf("%s \n", path);
-	}
-	else {
-		printf("Re-pathing has failed, please try again");
-		setenv("PATH", oldpath, 1);
-	}
-	chdir(getenv("PATH"));
 }
-
-void getpath() {
-	char *path = getenv("PATH");
-	printf("%s \n", path);
-}
-
-}
-
-
-
