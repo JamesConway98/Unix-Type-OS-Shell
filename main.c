@@ -9,20 +9,23 @@ void getInput();
 void shell_loop();
 int find_command(char []);
 void fork_command();
+void setpath(char []);
+void getpath();
 
 int running = 0;
 char *tkarray[512];
 
 
 void main(){
+	char *path = getenv("PATH"); /*saves original path*/
+	chdir(getenv("HOME"));
 	shell_loop();
-
+	setenv("PATH", path, 1); /*restores orignal path upon exit*/
+	printf("%s \n", path);
 }
 
 
 void shell_loop(){
-
-    chdir(getenv("HOME"));
 
     while(running == 0){
     	printf(":) ");
@@ -92,6 +95,14 @@ void getInput(){
 		}
 	}
 
+	else if (strcmp(tkarray[0], "getpath") == 0){
+		getpath();
+	}
+
+	else if (strcmp(tkarray[0], "setpath") == 0){
+		setpath(tkarray[1]);
+	}
+
 	else{
 		fork_command();
 		}
@@ -121,6 +132,26 @@ else if(pid > 0){
 
 }
 
+void setpath(char *dir) {
+	char *oldpath = getenv("PATH");
+	setenv("PATH", dir, 1);
+	char *path = getenv("PATH");
+	if (strcmp(dir, path) == 0) {
+		printf("%s \n", path);
+	}
+	else {
+		printf("Re-pathing has failed, please try again");
+		setenv("PATH", oldpath, 1);
+	}
+	chdir(getenv("PATH"));
 }
+
+void getpath() {
+	char *path = getenv("PATH");
+	printf("%s \n", path);
+}
+
+}
+
 
 
