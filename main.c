@@ -24,7 +24,7 @@ void main(){
 	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
 	shell_loop();
-	writeToFile(".hist_list.txt", history);//saves history
+	writeToFile(".hist_list.txt", "history");//saves history, needs history variable
 	setenv("PATH", path, 1); /*restores orignal path upon exit*/
 	printf("%s \n", path);
 }
