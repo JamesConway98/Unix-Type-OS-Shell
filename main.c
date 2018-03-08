@@ -1,4 +1,4 @@
-#include <stdio.h>
+##include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -11,20 +11,15 @@ int find_command(char []);
 void fork_command();
 void setpath(char []);
 void getpath();
-int writeToFile(char*, char*);
-int readFile(char*);
 
 int running = 0;
 char *tkarray[512];
 
 
 void main(){
-    
-    readFile(".hist_list.txt"); //prints history
 	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
 	shell_loop();
-	writeToFile(".hist_list.txt", "history");//saves history, needs history variable
 	setenv("PATH", path, 1); /*restores orignal path upon exit*/
 	printf("%s \n", path);
 }
@@ -50,7 +45,6 @@ void setpath(char *dir) {
 		printf("Re-pathing has failed, please try again");
 		setenv("PATH", oldpath, 1);
 	}
-	chdir(getenv("PATH"));
 }
 
 void getpath() {
@@ -107,16 +101,20 @@ void getInput(){
 	else if(strcmp(tkarray[0], "cd") == 0){
 		
 		if(nt == 2){
-			chdir(tkarray[1]);
-			printf("Changing dir\n");		
+			if (chdir(tkarray[1]) == 0) {
+				printf("Changing dir\n");
+			}else{
+				perror("Error");
+			}
 		}else if(nt == 1){
-			
+
 			chdir(getenv("HOME"));
 
 		}else{
 			printf("Error: cd takes 1 argument\n");	
 			
 		}
+		
 	}
 
 	else if (strcmp(tkarray[0], "getpath") == 0){
@@ -161,45 +159,6 @@ else if(pid == 0){
 
 else if(pid > 0){
 	wait(NULL);
-
-}
-
-}
-
-int writeToFile(char* fileName, char* history)
-{
-   
-   int num;
-   FILE *fptr;
-   fptr = fopen(fileName,"w");
-
-   fprintf(fptr,"%s", history);
-   fclose(fptr);
-
-   return 0;
-
-}
-
-int readFile(char* fileName)
-{
-   
-   int num;
-   char string[512];
-   char* lines[20];
-
-   FILE *fptr;
-   fptr = fopen(fileName,"r");
-
-   
-   while(fgets(string, 512, fptr) != NULL){
-
-       printf("%s\n", string);
-
-   }
-
-   fclose(fptr);
-   
-   return 0;
 
 }
 
