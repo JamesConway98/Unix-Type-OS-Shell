@@ -154,14 +154,15 @@ if(pid < 0) {
 }
 
 else if(pid == 0){
-	execlp(tkarray[0], "ls", NULL);
-	//only executed if the above line isn't successful
-	perror("Error"); 
+	execvp(tkarray[0], tkarray);
+	perror("Error: ");
 	exit(EXIT_FAILURE);
 }
 
 else if(pid > 0){
 	wait(NULL);
+
+}
 
 }
 
