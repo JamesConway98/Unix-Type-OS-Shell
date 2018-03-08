@@ -11,15 +11,20 @@ int find_command(char []);
 void fork_command();
 void setpath(char []);
 void getpath();
+int writeToFile(char*, char*);
+int readFile(char*);
 
 int running = 0;
 char *tkarray[512];
 
 
 void main(){
+    
+    readFile(".hist_list.txt"); //prints history
 	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
 	shell_loop();
+	writeToFile(".hist_list.txt", history);//saves history
 	setenv("PATH", path, 1); /*restores orignal path upon exit*/
 	printf("%s \n", path);
 }
@@ -157,6 +162,43 @@ else if(pid == 0){
 
 else if(pid > 0){
 	wait(NULL);
+
+}
+
+int writeToFile(char* fileName, char* history)
+{
+   
+   int num;
+   FILE *fptr;
+   fptr = fopen(fileName,"w");
+
+   fprintf(fptr,"%s", history);
+   fclose(fptr);
+
+   return 0;
+
+}
+
+int readFile(char* fileName)
+{
+   
+   int num;
+   char string[512];
+   char* lines[20];
+
+   FILE *fptr;
+   fptr = fopen(fileName,"r");
+
+   
+   while(fgets(string, 512, fptr) != NULL){
+
+       printf("%s\n", string);
+
+   }
+
+   fclose(fptr);
+   
+   return 0;
 
 }
 
