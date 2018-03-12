@@ -18,10 +18,17 @@ void setAlias(int index);
 void printAliases(int amount);
 void unalias();
 void checkAlias();
+void listHistory();
+void newCmd(char*);
 
 int running = 0;
 char *tkarray[512];
 int numAliases;
+
+#define historySize 20	// The size of the history array
+int cmdcount = 0;		// Keeps keeps track of the number of commands used
+char *history[historySize];	// Pointer to the specific commands used
+
 
 typedef struct alias{
 	char name[15];
@@ -30,20 +37,15 @@ typedef struct alias{
 
 struct alias aliases[10];
 
-#define historySize 20	// The size of the history array
-int cmdcount = 0;		// Keeps keeps track of the number of commands used
-char *history[historySize];	// Pointer to the specific commands used
-
-
 void main(){
     
-   	readFile(".hist_list.txt");//this outputs the content to the user, do we need that?
-	char *path = getenv("PATH"); 
+    readFile(".hist_list.txt");//prints history, this wont stay here just test
+	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
 	shell_loop();
-	writeToFile(".hist_list.txt", "history");
-	setenv("PATH", path, 1); 
-	printf("path: %s \n", path);
+	writeToFile(".hist_list.txt", "history");//saves history
+	setenv("PATH", path, 1); /*restores orignal path upon exit*/
+	printf("%s \n", path);
 }
 
 
@@ -63,7 +65,7 @@ void setpath(char *dir) {
 	setenv("PATH", dir, 1);
 	char *path = getenv("PATH");
 	if (strcmp(dir, path) == 0) {
-		printf("new path is: %s \n", path);
+		printf("%s \n", path);
 	}
 	else {
 		printf("Re-pathing has failed, please try again");
@@ -74,22 +76,6 @@ void setpath(char *dir) {
 void getpath() {
 	char *path = getenv("PATH");
 	printf("%s \n", path);
-}
-
-
-void newCmd(char* command) { //This function adds the new command to the history list
-     history[cmdcount%historySize] = command;
-printf("command %s \n", command);	
-printf("dmvn %s \n", history[(cmdcount%historySize)-1]);
-     cmdcount++;
- }
-
-void listHistory(){ //this function calls and displays the history
-for(int i = 0; i < cmdcount ; i++)
-        printf(" %s ",history[i]); //displays the history list from most to least recent
-
-	printf("%i \n", cmdcount);
-       printf("this  %s \n", history[2]);
 }
 
 
@@ -108,8 +94,15 @@ void getInput(){
 		running = 1;
 		return;
 	}
+	
+	/*
+	newCmd(input);		//This is a test to work out why history doesn't work
+	newCmd("Test");
+	*/
 
 	input[strlen(input)-1] = '\0';
+	
+	newCmd(input);		//This adds the input to the history of commands
 
 	token = strtok (input, " |><&;\t\n");
 
@@ -118,14 +111,15 @@ void getInput(){
 	}
 
 	while (token != NULL){
+		printf("'%s' \n", token);
 		tkarray[nt] = token;
+			
 		token = strtok (NULL, " |><&;\t\n");
 		nt++;
 	}
-
 	tkarray[nt] = NULL;
 
-   	checkAlias();
+    checkAlias();
     
 	if(strcmp(tkarray[0], "exit") == 0){
 		
@@ -144,7 +138,7 @@ void getInput(){
 			if (chdir(tkarray[1]) == 0) {
 				printf("Changing dir\n");
 			}else{
-				perror("Error: ");
+				perror("Error");
 			}
 		}else if(nt == 1){
 
@@ -156,31 +150,6 @@ void getInput(){
 		}
 		
 	}
-
-	else if(strcmp(tkarray[0], "history") == 0){ //Command displays history list
-		
-		if(nt == 1){ //takes one parameter
-			listHistory();
-		}else{
-			
-			printf("Error: History command doesn't take parameters\n");		
-
-		}
-	}
-	
-	else if(strncmp(tkarray[0], "!", 1) == 0){ //history invokation
-		
-		if(strcmp(tkarray[0], "!!") == 0 && nt == 1){
-			//do a thing
-		}else if(strncmp(tkarray[0], "!-", 2) == 0){
-		//also do a thing
-		}
-		else{
-			//do a thing as well		
-		}
-	}
-
-
 
 	else if (strcmp(tkarray[0], "getpath") == 0){
 		if (nt == 1) {
@@ -197,6 +166,30 @@ void getInput(){
 		}
 		else if (nt != 2) {
 			printf("Setpath requires one parameter, please try again. \n");
+		}
+	}
+	
+	else if(strncmp(tkarray[0], "!", 1) == 0){ //history invokation
+		
+		if(strcmp(tkarray[0], "!!") == 0 && nt == 1){
+			//do a thing
+		}else if(strncmp(tkarray[0], "!-", 2) == 0){
+		//also do a thing
+		}
+		else{
+			//do a thing as well		
+		}
+	}
+
+	
+	else if(strcmp(tkarray[0], "history") == 0){ //Command displays history list
+		
+		if(nt == 1){ //takes one parameter
+			listHistory();
+		}else{
+			
+			printf("Error: History command doesn't take parameters\n");		
+
 		}
 	}
 	
@@ -235,6 +228,21 @@ else if(strcmp(tkarray[0], "unalias") == 0){
 
 }
 
+
+void newCmd(char* command) { //This function adds the new command to the history list
+	
+	history[cmdcount] = command;
+	cmdcount++;
+	
+ }
+
+void listHistory(){ //this function calls and displays the history
+	for(int i = 0; i < cmdcount ; i++)
+        printf("%d.%s ", (i+1), history[i]); //displays the history list from most to least recent
+
+}
+
+
 void fork_command(){
 
 pid_t pid;
@@ -266,7 +274,6 @@ int amount = index;
 for(int i = 0; i < amount; i++){
 	if(strcmp(aliases[i].command, tkarray[2]) == 0){
 		amount = i;
-		printf("alias '%s -> %s' has been overridden.\n", aliases[amount].name, aliases[amount].command);
 		numAliases--;
 		}
 	}
@@ -296,6 +303,7 @@ void checkAlias(){
 
 for(int i = 0; i < numAliases; i++){
 	if(strcmp(aliases[i].name, tkarray[0]) == 0){
+		printf("alias has been found.\n");
 		strcpy(tkarray[0], aliases[i].command);}
 }
 
@@ -309,8 +317,8 @@ bool found = false;
 	for(int i = 0; i < numAliases; i++){
 		if(strcmp(aliases[i].command, tkarray[1]) == 0){
 			for(int j = i; j < sizeof(aliases)-1; j++){
-				strcpy(aliases[j].name, aliases[j+1].name);
-				strcpy(aliases[j].command, aliases[j+1].command);
+				strcpy(aliases[i].name, aliases[i+1].name);
+				strcpy(aliases[i].command, aliases[i+1].command);
 				found = true;
 			}
 			
@@ -348,15 +356,16 @@ void readFile(char* fileName)
    FILE *fptr;
    fptr = fopen(fileName,"r");
 
-   
-   while(fgets(string, 512, fptr) != NULL){
+   //checks if file exists then prints each line
+   if(fptr){
+	   while(fgets(string, 512, fptr) != NULL){
 
-       printf("%s\n", string);
+		   printf("%s\n", string);
 
+	   }
+
+		fclose(fptr);
    }
-
-   fclose(fptr);
 
 
 }
-
