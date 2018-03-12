@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdlib.h> 
+#include <stdbool.h>
 
 void getInput();
 void shell_loop();
@@ -13,10 +14,21 @@ void setpath(char []);
 void getpath();
 void writeToFile(char*, char*);
 void readFile(char*);
+void setAlias(int index);
+void printAliases(int amount);
+void unalias();
+void checkAlias();
 
 int running = 0;
 char *tkarray[512];
+int numAliases;
 
+typedef struct alias{
+	char name[15];
+	char command[15];
+}alias;
+
+struct alias aliases[10];
 
 void main(){
     
@@ -32,9 +44,11 @@ void main(){
 
 void shell_loop(){
 
+numAliases = 0;
+
     while(running == 0){
     	printf(":) ");
-	getInput();
+	    getInput();
     }   
 
 }
@@ -91,7 +105,8 @@ void getInput(){
 	}
 	tkarray[nt] = NULL;
 
-
+    checkAlias();
+    
 	if(strcmp(tkarray[0], "exit") == 0){
 		
 		if(nt == 1){
@@ -139,6 +154,35 @@ void getInput(){
 			printf("Setpath requires one parameter, please try again. \n");
 		}
 	}
+	
+    else if(strcmp(tkarray[0], "alias") == 0){
+	
+		if(nt >= 3){
+			if(numAliases <= 10){
+		 setAlias(numAliases);
+			numAliases++;}
+			else printf("Maximum number of aliases has been reached. unable to add alias.\n");
+			}
+
+		else if(nt == 1){
+		printAliases(numAliases);}
+		
+		else{ 
+			printf("Error: incorrect number of parameters for alias command.\n");}
+
+}
+
+else if(strcmp(tkarray[0], "unalias") == 0){
+
+	if(nt == 2){
+		unalias();
+		numAliases--;
+		}
+	else{
+		printf("Error: incorrect number of parameters for the unalias command.\n");}
+
+}
+
 
 	else{
 		fork_command();
@@ -168,6 +212,72 @@ else if(pid > 0){
 }
 
 }
+
+void setAlias(int index){
+
+
+int amount = index;
+
+for(int i = 0; i < amount; i++){
+	if(strcmp(aliases[i].command, tkarray[2]) == 0){
+		amount = i;
+		numAliases--;
+		}
+	}
+
+strcpy(aliases[amount].name, tkarray[1]);
+strcpy(aliases[amount].command, tkarray[2]);
+
+printf("new alias: %s -> %s\n", aliases[amount].name, aliases[amount].command);
+
+}
+
+void printAliases(int amount){
+
+if(amount == 0){
+printf("There are currently no saved aliases\n");
+}
+
+else {printf("The current saved aliases are: \n");
+	
+	for(int i = 0; i < amount; i++){
+		printf("alias %d :", i);
+		printf("%s -> %s\n", aliases[i].name, aliases[i].command);
+	}}
+}
+
+void checkAlias(){
+
+for(int i = 0; i < numAliases; i++){
+	if(strcmp(aliases[i].name, tkarray[0]) == 0){
+		printf("alias has been found.\n");
+		strcpy(tkarray[0], aliases[i].command);}
+}
+
+}
+
+
+void unalias(){
+
+bool found = false;
+
+	for(int i = 0; i < numAliases; i++){
+		if(strcmp(aliases[i].command, tkarray[1]) == 0){
+			for(int j = i; j < sizeof(aliases)-1; j++){
+				strcpy(aliases[i].name, aliases[i+1].name);
+				strcpy(aliases[i].command, aliases[i+1].command);
+				found = true;
+			}
+			
+		}
+	}
+
+if(found == false){
+printf("Error: No such alias exists.\n");
+}
+
+}
+
 
 
 void writeToFile(char* fileName, char* history)
