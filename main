@@ -138,7 +138,8 @@ void getInput(){
 			if (chdir(tkarray[1]) == 0) {
 				printf("Changing dir\n");
 			}else{
-				perror("Error");
+				perror("Error: ");
+
 			}
 		}else if(nt == 1){
 
@@ -274,6 +275,7 @@ int amount = index;
 for(int i = 0; i < amount; i++){
 	if(strcmp(aliases[i].command, tkarray[2]) == 0){
 		amount = i;
+		printf("alias '%s -> %s' has been overridden.\n", aliases[amount].name, aliases[amount].command);
 		numAliases--;
 		}
 	}
@@ -317,8 +319,8 @@ bool found = false;
 	for(int i = 0; i < numAliases; i++){
 		if(strcmp(aliases[i].command, tkarray[1]) == 0){
 			for(int j = i; j < sizeof(aliases)-1; j++){
-				strcpy(aliases[i].name, aliases[i+1].name);
-				strcpy(aliases[i].command, aliases[i+1].command);
+				strcpy(aliases[j].name, aliases[j+1].name);
+				strcpy(aliases[j].command, aliases[j+1].command);
 				found = true;
 			}
 			
@@ -369,3 +371,4 @@ void readFile(char* fileName)
 
 
 }
+
