@@ -239,7 +239,7 @@ void newCmd(char* command) { //This function adds the new command to the history
 
 void listHistory(){ //this function calls and displays the history
 	for(int i = 0; i < cmdcount ; i++)
-        printf("%d.%s ", (i+1), history[i]); //displays the history list from most to least recent
+        printf("%d.%s \n", (i+1), history[i]); //displays the history list from most to least recent
 
 }
 
