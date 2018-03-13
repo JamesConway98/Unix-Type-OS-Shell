@@ -27,7 +27,7 @@ int numAliases;
 
 #define historySize 20	// The size of the history array
 int cmdcount = 0;		// Keeps keeps track of the number of commands used
-char *history[historySize];	// Pointer to the specific commands used
+char *history[historySize][512];	// Pointer to the history of commands used
 
 
 typedef struct alias{
@@ -81,9 +81,10 @@ void getpath() {
 
 void getInput(){
 
-	char input[512];
+
 	char *token;
 	int nt = 0;
+	char input[512];
 
 	for(int i = 0; i<512; i++){
 			tkarray[i] = '\0';
@@ -94,11 +95,6 @@ void getInput(){
 		running = 1;
 		return;
 	}
-	
-	/*
-	newCmd(input);		//This is a test to work out why history doesn't work
-	newCmd("Test");
-	*/
 
 	input[strlen(input)-1] = '\0';
 	
@@ -230,16 +226,30 @@ else if(strcmp(tkarray[0], "unalias") == 0){
 }
 
 
-void newCmd(char* command) { //This function adds the new command to the history list
-	
-	history[cmdcount] = command;
-	cmdcount++;
-	
+void newCmd(char* inputcmd) { //This function adds the new command to the history list
+
+		strcpy(history[cmdcount%historySize], inputcmd);
+		cmdcount++;
+
  }
 
 void listHistory(){ //this function calls and displays the history
-	for(int i = 0; i < cmdcount ; i++)
-        printf("%d.%s \n", (i+1), history[i]); //displays the history list from most to least recent
+
+	if(cmdcount<20){ //this if statement displays the history without empty slots if <20 commands
+		for(int i = 0, j = cmdcount%historySize; i < cmdcount%(historySize) ; i++, j--)
+       		printf("%d.%s \n", (j), history[i]);
+	}
+	else{ //this is used to correctly display the circular array
+		int number = 20;
+		int i=cmdcount%historySize;
+		do{
+			if (history[i]) {
+				printf("%d %s\n", number, history[i]);
+				number--;
+			}
+			i = (i+1)%historySize;		//increments i++ in the circular array
+		}while (i!=cmdcount%historySize);	//then loops to the beginning before 								returning to cmdcount
+	}
 
 }
 
