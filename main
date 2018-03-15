@@ -406,7 +406,9 @@ void readFile(char* fileName)
 void loadHistory() { //loads contents of history file into current history
 	int i;
 	FILE *hist = fopen(".hist_list.txt", "r");
-	for (i = 0; i<historySize; i++) {
-		fscanf(hist, "%s", history[i]);
+	if (NULL != hist) { //checks to see if the file exists, otherwise should skip
+		for (i=0; i<20; i++) {
+			fscanf(hist, "%c", &history[i][0]);
+		}
 	}
 }
