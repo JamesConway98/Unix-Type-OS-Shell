@@ -20,6 +20,7 @@ void unalias();
 void checkAlias();
 void listHistory();
 void newCmd(char*);
+void checkCommands(int);
 
 int running = 0;
 char *tkarray[512];
@@ -27,7 +28,7 @@ int numAliases;
 
 #define historySize 20	// The size of the history array
 int cmdcount = 0;		// Keeps keeps track of the number of commands used
-char *history[historySize][512];	// Pointer to the history of commands used
+char history[historySize][512];	// Pointer to the history of commands used
 
 
 typedef struct alias{
@@ -90,35 +91,40 @@ void getInput(){
 			tkarray[i] = '\0';
 	}
 
-	if(fgets(input, 512, stdin) == NULL) {
+	if(fgets(input, 512, stdin) == NULL) { //exits if CTRL D is pressed
 		printf("\n");
 		running = 1;
 		return;
 	}
 
-	input[strlen(input)-1] = '\0';
+	input[strlen(input)-1] = '\0'; //adds null to end of input string
 	
 	
 
-	token = strtok (input, " |><&;\t\n");
+	token = strtok (input, " |><&;\t\n"); //creates tge furst token
 
-	if (token == NULL){
+	if (token == NULL){ //if input is enter key, returns to start of loop
 		return;
 	}
 
-	while (token != NULL){
+	while (token != NULL){	//tokenises rest of input
 		tkarray[nt] = token;
 			
 		token = strtok (NULL, " |><&;\t\n");
 		nt++;
 	}
-	tkarray[nt] = NULL;
+	tkarray[nt] = NULL; //sets the last token to null
 
-	newCmd(input);		//This adds the input to the history of commands
+	newCmd(input);	//This adds the input to the history of commands
 
-    checkAlias();
+    	checkAlias(); //changes letters in token array to aliases
+
+	checkCommands(nt);
+
+}
+void checkCommands(int nt){
     
-	if(strcmp(tkarray[0], "exit") == 0){
+	if(strcmp(tkarray[0], "exit") == 0){ //closes the shell
 		
 		if(nt == 1){
 			running = 1;
@@ -128,6 +134,20 @@ void getInput(){
 
 		}
 	}
+
+	else if(strncmp(tkarray[0], "!", 1) == 0){ //history invokation
+		
+		if(strcmp(tkarray[0], "!!") == 0 && nt == 2){
+			//do a thing
+		}else if(strcmp(tkarray[0], "!-") == 0){
+		//also do a thing
+		}
+		else{
+			//do a thing as well		
+		}
+	}
+
+	
 
 	else if(strcmp(tkarray[0], "cd") == 0){
 		
@@ -167,17 +187,7 @@ void getInput(){
 		}
 	}
 	
-	else if(strncmp(tkarray[0], "!", 1) == 0){ //history invokation
-		
-		if(strcmp(tkarray[0], "!!") == 0 && nt == 1){
-			//do a thing
-		}else if(strncmp(tkarray[0], "!-", 2) == 0){
-		//also do a thing
-		}
-		else{
-			//do a thing as well		
-		}
-	}
+
 
 	
 	else if(strcmp(tkarray[0], "history") == 0){ //Command displays history list
