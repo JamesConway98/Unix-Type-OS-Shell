@@ -21,6 +21,7 @@ void checkAlias();
 void listHistory();
 void newCmd(char*);
 void checkCommands(int);
+void loadHistory();
 
 int running = 0;
 char *tkarray[512];
@@ -41,6 +42,7 @@ struct alias aliases[10];
 void main(){
     
     //readFile(".hist_list.txt");//prints history, this wont stay here just test
+	loadHistory();
 	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
 	shell_loop();
@@ -399,4 +401,12 @@ void readFile(char* fileName)
    }
 
 
+}
+
+void loadHistory() { //loads contents of history file into current history
+	int i;
+	FILE *hist = fopen(".hist_list.txt", "r");
+	for (i = 0; i<historySize; i++) {
+		fscanf(hist, "%s", history[i]);
+	}
 }
