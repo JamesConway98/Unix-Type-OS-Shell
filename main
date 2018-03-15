@@ -87,7 +87,6 @@ void getpath() {
 void getInput(){
 
 	char input[512];
-    int aliasFound = 0;
 
 
 	if(fgets(input, 512, stdin) == NULL) { //gets input AND exits if CTRL D is pressed
@@ -101,6 +100,8 @@ void getInput(){
 }	
 
 void tokeniser(char *input){
+
+    int aliasFound = 0;
 
 		for(int i = 0; i<512; i++){
 			tkarray[i] = '\0';
