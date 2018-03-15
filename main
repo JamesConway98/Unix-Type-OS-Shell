@@ -39,7 +39,7 @@ struct alias aliases[10];
 
 void main(){
     
-    readFile(".hist_list.txt");//prints history, this wont stay here just test
+    //readFile(".hist_list.txt");//prints history, this wont stay here just test
 	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
 	shell_loop();
@@ -107,7 +107,6 @@ void getInput(){
 	}
 
 	while (token != NULL){
-		printf("'%s' \n", token);
 		tkarray[nt] = token;
 			
 		token = strtok (NULL, " |><&;\t\n");
@@ -134,7 +133,7 @@ void getInput(){
 			if (chdir(tkarray[1]) == 0) {
 				printf("Changing dir\n");
 			}else{
-				perror("Error: ");
+				perror("Error");
 
 			}
 		}else if(nt == 1){
@@ -228,7 +227,7 @@ else if(strcmp(tkarray[0], "unalias") == 0){
 
 void newCmd(char* inputcmd) { //This function adds the new command to the history list
 
-		strcpy(history[cmdcount%historySize], inputcmd);
+		strcpy(*history[cmdcount%historySize], inputcmd);
 		cmdcount++;
 
  }
@@ -237,14 +236,14 @@ void listHistory(){ //this function calls and displays the history
 
 	if(cmdcount<20){ //this if statement displays the history without empty slots if <20 commands
 		for(int i = 0, j = cmdcount%historySize; i < cmdcount%(historySize) ; i++, j--)
-       		printf("%d.%s \n", (j), history[i]);
+       		printf("%d.%p \n", (j), history[i]);
 	}
 	else{ //this is used to correctly display the circular array
 		int number = 20;
 		int i=cmdcount%historySize;
 		do{
 			if (history[i]) {
-				printf("%d %s\n", number, history[i]);
+				printf("%d %p\n", number, history[i]);
 				number--;
 			}
 			i = (i+1)%historySize;		//increments i++ in the circular array
@@ -266,7 +265,7 @@ if(pid < 0) {
 
 else if(pid == 0){
 	execvp(tkarray[0], tkarray);
-	perror("Error: ");
+	perror("Error");
 	exit(EXIT_FAILURE);
 }
 
