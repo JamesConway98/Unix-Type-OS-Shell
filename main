@@ -103,7 +103,9 @@ void tokeniser(char *input){
 
 		for(int i = 0; i<512; i++){
 			tkarray[i] = '\0';
+
 	}
+			printf("Tokens reset");
 	char inputcpy[512];
 	char *token;
 	int nt = 0; //number of tokens
@@ -135,9 +137,10 @@ void tokeniser(char *input){
 		int histnum = atoi(tkarray[1]);	
 
 		printf("%d\n", histnum);
-		strcpy(input, history[(cmdcount%historySize)-1]);
-		
-
+		strcpy(input, history[histnum-1]);
+printf("%s\n", input);
+		//tokeniser(input);
+printf("This shouldnt show");
 		}
 		else{
 			//do a thing as well		
