@@ -259,7 +259,7 @@ void checkCommands(int nt){
 else if(strcmp(tkarray[0], "unalias") == 0){
 
 	if(nt == 2){
-		unalias();
+		unalias(nt);
 		numAliases--;
 		}
 	else{
