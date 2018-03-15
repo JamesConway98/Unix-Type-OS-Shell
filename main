@@ -10,7 +10,7 @@ void shell_loop();
 void getInput();
 void tokeniser(char *);
 void newCmd(char*);
-void checkAlias();
+int checkAlias();
 void checkCommands(int);
 int find_command(char []);
 void fork_command();
@@ -18,9 +18,9 @@ void setpath(char []);
 void getpath();
 void writeToFile(char*, char*);
 void readFile(char*);
-void setAlias(int nt);
+void setAlias(int noTokens);
 void printAliases();
-void unalias();
+void unalias(int noTokens);
 
 void listHistory();
 
@@ -36,7 +36,8 @@ char history[historySize][512];	// Pointer to the history of commands used
 
 typedef struct alias{
 	char name[15];
-	char command[15];
+	char command[15][15];
+	int parameters;
 }alias;
 
 struct alias aliases[10];
@@ -86,7 +87,7 @@ void getpath() {
 void getInput(){
 
 	char input[512];
-
+    int aliasFound = 0;
 
 
 	if(fgets(input, 512, stdin) == NULL) { //gets input AND exits if CTRL D is pressed
@@ -114,17 +115,35 @@ void tokeniser(char *input){
 
 
 	token = strtok (input, " |><&;\t\n"); //creates the first token
-
+	
+	
 	if (token == NULL){ //if input is enter key, returns to start of loop
 		return;
+	}
+	
+	
+	tkarray[nt] = token; //not sure if we still need this line 
+	
+	//adjusts nt variable for any aliased parameters
+	aliasFound = checkAlias();
+	if(aliasFound > 0){
+	nt = nt + aliasFound;
 	}
 
 	while (token != NULL){	//tokenises rest of input
 		tkarray[nt] = token;
-			
 		token = strtok (NULL, " |><&;\t\n");
 		nt++;
 	}
+	
+	//makes sure alias name isn't part of the tkarray (writes over it)
+	if(aliasFound > 0){
+		for(int i = aliasFound; i < nt; i++){
+		tkarray[i] = tkarray[i+1];
+		}	
+	nt--;
+	}
+	
 	tkarray[nt] = NULL; //sets the last token to null
 
 	if(strcspn(tkarray[0], "!-") == 0){ //history invokation. MUST BE ABOVE CHECKCOMMANDS
@@ -312,19 +331,25 @@ void setAlias(int noTokens){
 
 int amount = numAliases;
 
-
+//checks if there are any aliases already using the name given
 for(int i = 0; i < amount; i++){
-	if(strcmp(aliases[i].command, tkarray[2]) == 0){
+	if(strcmp(aliases[i].name, tkarray[1]) == 0){
 		amount = i;
-		printf("alias '%s -> %s' has been overridden.\n", aliases[amount].name, aliases[amount].command);
-		numAliases--;
-		}
+		numAliases--;	
+		printf("alias '%s' will be overrided.\n", aliases[i].name);
 	}
 
-if(numAliases < 10){
+}
+
+
+if(numAliases < 10){//ensures we don't have more than ten aliases stored
 	strcpy(aliases[amount].name, tkarray[1]);
-	strcpy(aliases[amount].command, tkarray[2]);
-	printf("new alias: %s -> %s\n", aliases[amount].name, aliases[amount].command);
+	aliases[amount].parameters = noTokens-2;
+	printf("new alias: %s -> ", aliases[amount].name);
+	for(int i = 0; i <  aliases[amount].parameters; i++){ //copies all parameters of the aliased command
+		strcpy(aliases[amount].command[i], tkarray[i+2]);
+		printf("%s ", aliases[amount].command[i]);}
+	printf("\n");
 }
 
 else{ 	printf("Maximum number of aliases has been reached. unable to add alias.\n");
@@ -343,43 +368,69 @@ else
 	printf("The current saved aliases are: \n");
 	
 	for(int i = 0; i < amount; i++){
-		printf("alias %d :", i);
-		printf("%s -> %s\n", aliases[i].name, aliases[i].command);
+		printf("alias %d: ", i+1);
+		printf("%s -> ", aliases[i].name);
+		for(int j = 0; j < aliases[i].parameters; j++){
+			printf("%s ", aliases[i].command[j]);}
+		printf("\n");
 	}
 }
 
-void checkAlias(){
+int checkAlias(){
+
+int addedTokens = 0;
 
 for(int i = 0; i < numAliases; i++){
-	if(strcmp(aliases[i].name, tkarray[0]) == 0){
-		strcpy(tkarray[0], aliases[i].command);}
+	if(strcmp(tkarray[0], aliases[i].name)==0){
+		for(int j = 0; j < aliases[i].parameters; j++){
+			tkarray[j] = aliases[i].command[j];
+			addedTokens++;
+		}
+	}
 }
 
+return addedTokens; //for adjusting nt variable
+
 }
 
 
-void unalias(){
+void unalias(int noTokens){
 
 bool found = false;
 int amount = numAliases;
+int foundAt = 0;
 
-	for(int i = 0; i < amount; i++){
-		if(strcmp(aliases[i].command, tkarray[1]) == 0){
-			for(int j = i; j <= amount-1; j++){
-				strcpy(aliases[j].name, aliases[j+1].name);
-				strcpy(aliases[j].command, aliases[j+1].command);
-				found = true;
-			}
-			strcpy(aliases[amount-1].name, "\0");
-			strcpy(aliases[amount-1].command, "\0");
-			
+for(int i = 0; i < amount; i++){
+		if(strcmp(aliases[i].name, tkarray[1]) == 0){
+			foundAt = i;
+			found = true;	
 		}
-	}
 
-if(found == false){
-printf("Error: No such alias exists.\n");
+}
+if(found == true){	
+	for(int i = foundAt; i < amount-1; i++){
+		strcpy(aliases[i].name, aliases[i+1].name);
+		aliases[i].parameters = aliases[i+1].parameters;
+			for(int k = 0; k < aliases[i].parameters; k++){
+				strcpy(aliases[i].command[k], aliases[i+1].command[k]);
+			}
+    }
 }
 
+if(found == false){
+	printf("Error: No such alias exists.\n");
+	numAliases++;
+}
+
+else{ 
+	strcpy(aliases[amount-1].name, "\0");
+	aliases[amount-1].parameters = 0;
+	for(int j = 0; j < aliases[amount-1].parameters; j++){
+		strcpy(aliases[amount-1].command[j], "\0");
+
+	}
+	printf("alias successfully removed.\n");
+}
 }
 
 
