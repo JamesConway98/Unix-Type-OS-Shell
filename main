@@ -168,7 +168,7 @@ printf("This shouldnt show");
 		newCmd(inputcpy);	//This adds the input to the history of commands
 	}
 
-    	checkAlias(); //changes letters in token array to aliases
+
 
 	checkCommands(nt); //checks the input for list of commands
 
