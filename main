@@ -43,11 +43,11 @@ struct alias aliases[10];
 
 void main(){
     
-    //readFile(".hist_list.txt");//prints history, this wont stay here just test
+    
 	char *path = getenv("PATH"); /*saves original path*/
 	chdir(getenv("HOME"));
+	readFile(".hist_list.txt");// loads history from file
 	shell_loop();
-	writeToFile(".hist_list.txt", "history");//saves history
 	setenv("PATH", path, 1); /*restores orignal path upon exit*/
 	printf("%s \n", path);
 }
@@ -256,6 +256,7 @@ else if(strcmp(tkarray[0], "unalias") == 0){
 void newCmd(char* inputcmd) { //This function adds the new command to the history list
 
 		strcpy(history[cmdcount%historySize], inputcmd);
+		writeToFile(".hist_list.txt", strcpy(history[cmdcount%historySize], inputcmd));
 		cmdcount++;
 
  }
@@ -380,14 +381,15 @@ printf("Error: No such alias exists.\n");
 
 
 
-void writeToFile(char* fileName, char* history)
+void writeToFile(char* fileName, char* text)
 {
    
    int num;
    FILE *fptr;
-   fptr = fopen(fileName,"w");
+   char* currentHistory;
+   fptr = fopen(fileName,"a");
 
-   fprintf(fptr,"%s", history);
+   fprintf(fptr,"%s\n", text);
    fclose(fptr);
 
 
@@ -396,7 +398,7 @@ void writeToFile(char* fileName, char* history)
 void readFile(char* fileName)
 {
    
-   int num;
+   int i = 0;
    char string[512];
    char* lines[20];
 
@@ -407,7 +409,11 @@ void readFile(char* fileName)
    if(fptr){
 	   while(fgets(string, 512, fptr) != NULL){
 
-		   printf("%s\n", string);
+		   //printf("%d. %s", i, string);
+		   strcpy(history[i%historySize], string);
+		   i++;
+		   cmdcount++;
+		
 
 	   }
 
@@ -416,3 +422,4 @@ void readFile(char* fileName)
 
 
 }
+
