@@ -98,7 +98,7 @@ void getInput(){
 
 	input[strlen(input)-1] = '\0';
 	
-	newCmd(input);		//This adds the input to the history of commands
+	
 
 	token = strtok (input, " |><&;\t\n");
 
@@ -113,6 +113,8 @@ void getInput(){
 		nt++;
 	}
 	tkarray[nt] = NULL;
+
+	newCmd(input);		//This adds the input to the history of commands
 
     checkAlias();
     
