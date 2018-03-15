@@ -104,9 +104,10 @@ void tokeniser(char *input){
 		for(int i = 0; i<512; i++){
 			tkarray[i] = '\0';
 	}
-
+	char inputcpy[512];
 	char *token;
 	int nt = 0; //number of tokens
+	strcpy(inputcpy, input); //makes a copy of input
 
 
 
@@ -127,16 +128,22 @@ void tokeniser(char *input){
 	if(strcspn(tkarray[0], "!-") == 0){ //history invokation. MUST BE ABOVE CHECKCOMMANDS
 		if(strcmp(tkarray[0], "!!") == 0 && nt == 1){
 
-			strcpy(input, history[(cmdcount%historySize)-1]);
+		strcpy(input, history[(cmdcount%historySize)-1]);
 
 		}else if(strcmp(tkarray[0], "!-") == 0 && nt == 2){
-		strcpy(input, history[(cmdcount%historySize)-tkarray[1]]);
+
+		int histnum = atoi(tkarray[1]);	
+
+		printf("%d\n", histnum);
+		strcpy(input, history[(cmdcount%historySize)-1]);
+		
+
 		}
 		else{
 			//do a thing as well		
 		}
 	}else{
-		newCmd(input);	//This adds the input to the history of commands
+		newCmd(inputcpy);	//This adds the input to the history of commands
 	}
 
     	checkAlias(); //changes letters in token array to aliases
