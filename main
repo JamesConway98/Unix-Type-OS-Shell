@@ -450,42 +450,44 @@ else{
 
 void writeToFile(char* fileName, char* text)
 {
-   
-   int num;
-   FILE *fptr;
-   char* currentHistory;
-   fptr = fopen(fileName,"a");
+   	char* path = getenv("PATH");
+	chdir(getenv("HOME")); //changes directory to home whenever history is saved
+   	int num;
+   	FILE *fptr;
+   	char* currentHistory;
+   	fptr = fopen(fileName,"a");
 
-   fprintf(fptr,"%s\n", text);
-   fclose(fptr);
-
-
+   	fprintf(fptr,"%s\n", text);
+   	fclose(fptr);
+	chdir(path); //changes directory back again
 }
 
 void readFile(char* fileName)
 {
    
-   int i = 0;
-   char string[512];
-   char* lines[20];
+	int i = 0;
+   	char string[512];
+   	char* lines[20];
+	char* path = getenv("PATH");
+	chdir(getenv("HOME")); //changes directory to home whenever history is read to ensure right file
 
-   FILE *fptr;
-   fptr = fopen(fileName,"r");
+  	FILE *fptr;
+   	fptr = fopen(fileName,"r");
 
-   //checks if file exists then prints each line
-   if(fptr){
-	   while(fgets(string, 512, fptr) != NULL){
+   	//checks if file exists then prints each line
+   	if(fptr){
+	   	while(fgets(string, 512, fptr) != NULL){
 
-		   //printf("%d. %s", i, string);
-		   strcpy(history[i%historySize], string);
-		   i++;
-		   cmdcount++;
+		   	//printf("%d. %s", i, string);
+		   	strcpy(history[i%historySize], string);
+		   	i++;
+		   	cmdcount++;
 		
 
-	   }
+	   	}
 
 		fclose(fptr);
-   }
-
+		chdir(path); //changes directory back again
+   	}
 
 }
