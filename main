@@ -226,7 +226,7 @@ void checkCommands(){
 			if (chdir(tkarray[1]) == 0) {
 				printf("Changing dir\n");
 			}else{
-				perror("Error");
+				perror(tkarray[nt-1]);
 
 			}
 		}else if(nt == 1){
@@ -352,7 +352,7 @@ if(pid < 0) {
 
 else if(pid == 0){
 	execvp(tkarray[0], tkarray);
-	perror("Error");
+	perror(tkarray[nt-1]);
 	exit(EXIT_FAILURE);
 }
 
