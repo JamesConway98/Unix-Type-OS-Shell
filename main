@@ -21,25 +21,24 @@ void readFile(char*);
 void setAlias(int noTokens);
 void printAliases();
 void unalias(int noTokens);
-
 void listHistory();
 
 
-int running = 0;
-char *tkarray[512];
-int numAliases;
-	char input[512];
-	int nt = 0; //number of tokens
+int running = 0; 					//keep program running 
+char *tkarray[512]; 					//array of tokens
+int numAliases; 					//number of aliases
+char input[512];					//input given by user
+int nt = 0; 						//number of tokens
 
-#define historySize 20	// The size of the history array
-int cmdcount = 0;		// Keeps keeps track of the number of commands used
-char history[historySize][512];	// Pointer to the history of commands used
+#define historySize 20					// The size of the history array
+int cmdcount = 0;					// number of commands
+char history[historySize][512];				// array of history commands
 
 
 typedef struct alias{
-	char name[15];
-	char command[15][15];
-	int parameters;
+	char name[15]; 					//name of alias
+	char command[15][15];				//alias command
+	int parameters;					//number of parameters for alias
 }alias;
 
 struct alias aliases[10];
@@ -47,31 +46,38 @@ struct alias aliases[10];
 void main(){
     
     
-	char *path = getenv("PATH"); /*saves original path*/
+	char *path = getenv("PATH"); 			//saves original path
 	chdir(getenv("HOME"));
-	readFile(".hist_list.txt");// loads history from file
+	readFile(".hist_list.txt");			// loads history from file
 	shell_loop();
-	setenv("PATH", path, 1); /*restores orignal path upon exit*/
+	setenv("PATH", path, 1); 			//restores orignal path upon exit//
 	printf("%s \n", path);
 }
 
-
+/*
+allows for the shell to continuously loop until it has been told to exit
+*/
 void shell_loop(){
 
-numAliases = 0;
+	numAliases = 0;						
 
-    while(running == 0){
-    	printf(":) ");
-	getInput();
-	
-	 }   
+	//continuous loop for running program
+    	while(running == 0){
+    		printf(":) ");
+		getInput();
+	}   
 
 }
 
+/*
+
+*/
 void setpath(char *dir) {
 	char *oldpath = getenv("PATH");
 	setenv("PATH", dir, 1);
 	char *path = getenv("PATH");
+
+
 	if (strcmp(dir, path) == 0) {
 		printf("%s \n", path);
 	}
@@ -81,61 +87,60 @@ void setpath(char *dir) {
 	}
 }
 
+/*
+
+*/
 void getpath() {
 	char *path = getenv("PATH");
 	printf("%s \n", path);
 }
 
-
+/*
+gets input from user
+*/
 void getInput(){
-
-
-
-
-	if(fgets(input, 512, stdin) == NULL) { //gets input AND exits if CTRL D is pressed
+	
+	//loop that exits if CTRL D is pressed
+	if(fgets(input, 512, stdin) == NULL) { 
 		printf("\n");
 		running = 1;
 		return;
 	}
 
-	input[strlen(input)-1] = '\0'; //adds null to end of input string
-tokeniser();
+	input[strlen(input)-1] = '\0'; 			//adds null to end of input string
+	tokeniser();
 }	
 
+/*
+
+*/
 int tokeniser(){
-
-    int aliasFound = 0;
-	nt = 0;
-
-		for(int i = 0; i<512; i++){
-			tkarray[i] = '\0';
-
-	}
-printf("tkarray is: %s", tkarray[0]);
-	
 
 	char inputcpy[512];
 	char *token;
+    	int aliasFound = 0;
+	char num[2];
+	int number = 0;
+	nt = 0;
 
-	strcpy(inputcpy, input); //makes a copy of input
+	for(int i = 0; i<512; i++){
+			tkarray[i] = '\0';
+	}
 
-
-
-	token = strtok (input, " |><&;\t\n"); //creates the first token
+	printf("tkarray is: %s", tkarray[0]);
+	strcpy(inputcpy, input); 			//makes a copy of input
+	token = strtok (input, " |><&;\t\n"); 		//creates the first token
 	
-	
-	if (token == NULL){ //if input is enter key, returns to start of loop	
+	//creates loop for when enter key is pressed on its own, returns to start to go through loop
+	if (token == NULL){ 	
 		return 0;
 	}
 	
-	
-	tkarray[nt] = token; //not sure if we still need this line 
-	
-	//adjusts nt variable for any aliased parameters
+	tkarray[nt] = token;
 	aliasFound = checkAlias();
 
 	if(aliasFound > 0){
-	nt = nt + aliasFound;
+		nt = nt + aliasFound;
 	}
 
 	while (token != NULL){	//tokenises rest of input
@@ -147,328 +152,278 @@ printf("tkarray is: %s", tkarray[0]);
 	//makes sure alias name isn't part of the tkarray (writes over it)
 	if(aliasFound > 0){
 		for(int i = aliasFound; i < nt; i++){
-		tkarray[i] = tkarray[i+1];
+			tkarray[i] = tkarray[i+1];
 		}	
-	nt--;
+		nt--;
 	}
 	
-	tkarray[nt] = NULL; //sets the last token to null
+	tkarray[nt] = NULL;				//sets the last token to null
 
 
-if(strncmp(tkarray[0], "!", 1)==0){
+	if(strncmp(tkarray[0], "!", 1)==0){
 
-	if(strncmp(tkarray[0], "!!", 2)==0){
-
-		//printf("command in history: %s\n", history[cmdcount%historySize-1]);
-		//strcpy(inputcpy, history[cmdcount%historySize-1]);
-	//printf("command in tk array: %s\n", tkarray[0]);
-	strcpy(input, history[cmdcount%historySize-1]);
-	tokeniser();
-	//printf("command in tk array: %s\n", tkarray[0]);
-	return 0;
-
-	}
-	else if(strncmp(tkarray[0], "!-", 2)==0){
-		char num[2];
-		int number = 0;
-		strncpy(num, tkarray[0]+2, 2);
-		number = atoi(num);
-		//printf("command in history: %s\n", history[cmdcount%historySize-1-number]);
+		if(strncmp(tkarray[0], "!!", 2)==0){
+			strcpy(input, history[cmdcount%historySize-1]);
+			tokeniser();
+			return 0;
+		} else if(strncmp(tkarray[0], "!-", 2)==0){
+			strncpy(num, tkarray[0]+2, 2);
+			number = atoi(num);
 			strcpy(input, history[cmdcount%historySize-1-number]);
-		tokeniser();
-		return 0;
-		
+			tokeniser();
+			return 0;
+		} else{
+			number = 0;
+			strncpy(num, tkarray[0]+1, 2);
+			number = atoi(num);
+			strcpy(input, history[cmdcount%historySize-21+number]);
+			tokeniser();
+			return 0;
+		}
+	}else{
+		newCmd(inputcpy);
+	}
+
 	
-	}
-
-	else{//used when !<no> is entered
-		char num[2];
-		int number = 0;
-		strncpy(num, tkarray[0]+1, 2);
-		number = atoi(num);
-		printf("command in history: %s\n", history[cmdcount%historySize-21+number]);
-		strcpy(input, history[cmdcount%historySize-21+number]);
-	//strcpy(history[cmdcount%historySize-21+number], inputcpy);
-	printf("command in tk array: %s\n", inputcpy);
-		tokeniser();
-	printf("command in tk array the second: %s\n", tkarray[0]);
-		return 0;
-	}
+	checkCommands(); //checks the input for list of commands
+	return 0;
 }
 
-else{
-	newCmd(inputcpy);
-}
-checkCommands(); //checks the input for list of commands
-return 0;
+/*
 
-   
-
-}
+*/
 void checkCommands(){
-	printf("command for execution: %s\n", tkarray[0]);
-    
-	if(strcmp(tkarray[0], "exit") == 0){ //closes the shell
-		
+
+	//closes the shell when exit is entered
+	if(strcmp(tkarray[0], "exit") == 0){ 
 		if(nt == 1){
 			running = 1;
-		}else{
-			
+		} else {
 			printf("Error: exit command doesn't take parameters\n");		
-
 		}
-	}
-	
-
-	else if(strcmp(tkarray[0], "cd") == 0){//changes directory
-		
+	} else if(strcmp(tkarray[0], "cd") == 0){	//changes directory
 		if(nt == 2){
 			if (chdir(tkarray[1]) == 0) {
 				printf("Changing dir\n");
-			}else{
+			} else {
 				perror(tkarray[nt-1]);
-
 			}
-		}else if(nt == 1){
-
+		} else if(nt == 1){
 			chdir(getenv("HOME"));
-
-		}else{
-			printf("Error: cd takes 1 argument\n");	
-			
+		} else {
+			printf("Error: cd takes 1 argument\n");		
 		}
-		
-	}
-
-	else if (strcmp(tkarray[0], "getpath") == 0){//returns current path
+	} else if (strcmp(tkarray[0], "getpath") == 0){//returns current path
 		if (nt == 1) {
 			getpath();
-		}
-		else {
+		} else {
 			printf("Error: Getpath does not require any parameters. \n");
 		}
-	}
-
-	else if (strcmp(tkarray[0], "setpath") == 0){//changes current path
+	} else if (strcmp(tkarray[0], "setpath") == 0){//changes current path
 		if (nt ==2) {
 			setpath(tkarray[1]);
-		}
-		else if (nt != 2) {
+		} else if (nt != 2) {
 			printf("Error: incorrect number of parameters. Setpath requires one argument. \n");
 		}
-	}
-	
-
-
-	
-	else if(strcmp(tkarray[0], "history") == 0){ //Command displays history list
-		
+	} else if(strcmp(tkarray[0], "history") == 0){ //Command displays history list
 		if(nt == 1){ //takes one parameter
 			listHistory();
-		}else{
-			
+		} else {
 			printf("Error: History command doesn't take parameters\n");		
-
 		}
-	}
-	
-    else if(strcmp(tkarray[0], "alias") == 0){
-	
+	} else if(strcmp(tkarray[0], "alias") == 0){
 		if(nt >= 3){//sets new alias
 			if(numAliases <= 10){
-		 setAlias(nt);
-			numAliases++;}
-			else printf("Error: Maximum number of aliases has been reached. unable to add alias.\n");
+		 		setAlias(nt);
+				numAliases++;
+			} else {
+				printf("Error: Maximum number of aliases has been reached. unable to add alias.\n");
+			} else if(nt == 1){//prints list of aliases
+				printAliases();
+			} else { 
+				printf("Error: incorrect number of parameters for alias command.\n");
 			}
-
-		else if(nt == 1){//prints list of aliases
-		printAliases();}
-		
-		else{ 
-			printf("Error: incorrect number of parameters for alias command.\n");}
-
-}
-
-else if(strcmp(tkarray[0], "unalias") == 0){//removes alias
-
-	if(nt == 2){
-		unalias(nt);
-		numAliases--;
+		} else if(strcmp(tkarray[0], "unalias") == 0){//removes alias
+			if(nt == 2){
+				unalias(nt);
+				numAliases--;
+			} else {
+				printf("Error: incorrect number of parameters for the unalias command.\n");
+			}
+		} else {
+			fork_command();
 		}
-	else{
-		printf("Error: incorrect number of parameters for the unalias command.\n");}
-
+	}	
 }
 
-
-	else{
-		fork_command();
-		}
-
-}
-
-
-void newCmd(char* inputcmd) { //This function adds the new command to the history list
+/*
+	Add the new command to the history array
+*/
+void newCmd(char* inputcmd) {
 
 		strcpy(history[cmdcount%historySize], inputcmd);
 		writeToFile(".hist_list.txt", strcpy(history[cmdcount%historySize], inputcmd));
 		cmdcount++;
-
  }
 
-void listHistory(){ //this function calls and displays the history
+/*
+	calls and displays the history 
+*/
+void listHistory(){ 
 
 	if(cmdcount<20){ //this if statement displays the history without empty slots if <20 commands
-		for(int i = 0, j = 1; i < cmdcount%(historySize) ; i++, j++)
-       		printf("%d.%s\n", j, history[i]);
-	}
-	else{ //this is used to correctly display the circular array
+		for(int i = 0, j = 1; i < cmdcount%(historySize) ; i++, j++){
+       			printf("%d.%s\n", j, history[i]);
+		}
+	} else { 
 		int number = 1;
 		int i=cmdcount%historySize;
+
 		do{
 			if (history[i]) {
 				printf("%d: %s\n", (number), history[i]);
 				number++;
 			}
-			i = (i+1)%historySize;		//increments i++ in the circular array
+			i = (i+1)%historySize;		
 		}while (i!=cmdcount%historySize);
-
-//then loops to the beginning before returning to cmdcount
 	}
-
-
 }
 
+/*
 
+*/
 void fork_command(){
 
-pid_t pid;
+	pid_t pid;
+	pid = fork();
 
-pid = fork();
-
-if(pid < 0) {
-	fprintf(stderr, "Fork Failed");
+	if(pid < 0) {
+		fprintf(stderr, "Fork Failed");
+	} else if(pid == 0){
+		execvp(tkarray[0], tkarray);
+		perror(tkarray[nt-1]);
+		exit(EXIT_FAILURE);
+	} else if(pid > 0){
+		wait(NULL);
+	}
 }
 
-else if(pid == 0){
-	execvp(tkarray[0], tkarray);
-	perror(tkarray[nt-1]);
-	exit(EXIT_FAILURE);
-}
+/*
 
-else if(pid > 0){
-	wait(NULL);
-
-}
-
-}
-
+*/
 void setAlias(int noTokens){
 
-int amount = numAliases;
+	int amount = numAliases;
 
-//checks if there are any aliases already using the name given
-for(int i = 0; i < amount; i++){
-	if(strcmp(aliases[i].name, tkarray[1]) == 0){
-		amount = i;
-		numAliases--;	
-		printf("alias %s -> ", aliases[i].name);
-		for(int i = 0; i <  aliases[amount].parameters; i++){ 
-			printf("%s ", aliases[amount].command[i]);}
-		printf(" will be overrided.\n");
+	//checks if there are any aliases already using the name given
+	for(int i = 0; i < amount; i++){
+		if(strcmp(aliases[i].name, tkarray[1]) == 0){
+			amount = i;
+			numAliases--;	
+			printf("alias %s -> ", aliases[i].name);
+			for(int i = 0; i <  aliases[amount].parameters; i++){ 
+				printf("%s ", aliases[amount].command[i]);
+			}
+			printf(" will be overrided.\n");
+		}
+	}
+
+	if(numAliases < 10){//ensures we don't have more than ten aliases stored
+		strcpy(aliases[amount].name, tkarray[1]);
+		aliases[amount].parameters = noTokens-2;
+		printf("new alias: %s -> ", aliases[amount].name);
+		for(int i = 0; i <  aliases[amount].parameters; i++){ //copies all parameters of the aliased command
+			strcpy(aliases[amount].command[i], tkarray[i+2]);
+			printf("%s ", aliases[amount].command[i]);
+		}
+		printf("\n");
+	} else { 	
+		printf("Maximum number of aliases has been reached. unable to add alias.\n");
+		numAliases--;
 	}
 
 }
 
+/*
 
-if(numAliases < 10){//ensures we don't have more than ten aliases stored
-	strcpy(aliases[amount].name, tkarray[1]);
-	aliases[amount].parameters = noTokens-2;
-	printf("new alias: %s -> ", aliases[amount].name);
-	for(int i = 0; i <  aliases[amount].parameters; i++){ //copies all parameters of the aliased command
-		strcpy(aliases[amount].command[i], tkarray[i+2]);
-		printf("%s ", aliases[amount].command[i]);}
-	printf("\n");
-}
-
-else{ 	printf("Maximum number of aliases has been reached. unable to add alias.\n");
-	numAliases--;}
-
-}
-
+*/
 void printAliases(){
 
-int amount = numAliases;
+	int amount = numAliases;
 
-if(amount == 0)
-	printf("There are currently no saved aliases\n");
-
-else 
-	printf("The current saved aliases are: \n");
-	
+	if(amount == 0){
+		printf("There are currently no saved aliases\n");
+	} else { 
+		printf("The current saved aliases are: \n");
+	}
 	for(int i = 0; i < amount; i++){
 		printf("alias %d: ", i+1);
 		printf("%s -> ", aliases[i].name);
 		for(int j = 0; j < aliases[i].parameters; j++){
-			printf("%s ", aliases[i].command[j]);}
+			printf("%s ", aliases[i].command[j]);
+		}
 		printf("\n");
 	}
 }
 
+/*
+
+*/
 int checkAlias(){
 
-int addedTokens = 0;
+	int addedTokens = 0;
 
-for(int i = 0; i < numAliases; i++){
-	if(strcmp(tkarray[0], aliases[i].name)==0){
-		for(int j = 0; j < aliases[i].parameters; j++){
-			tkarray[j] = aliases[i].command[j];
-			addedTokens++;
+	for(int i = 0; i < numAliases; i++){
+		if(strcmp(tkarray[0], aliases[i].name)==0){
+			for(int j = 0; j < aliases[i].parameters; j++){
+				tkarray[j] = aliases[i].command[j];
+				addedTokens++;
+			}
 		}
 	}
+
+	return addedTokens; 				//for adjusting nt variable
+
 }
 
-return addedTokens; //for adjusting nt variable
+/*
 
-}
-
-
+*/
 void unalias(int noTokens){
 
-bool found = false;
-int amount = numAliases;
-int foundAt = 0;
+	bool found = false;
+	int amount = numAliases;
+	int foundAt = 0;
 
-for(int i = 0; i < amount; i++){
+	for(int i = 0; i < amount; i++){
 		if(strcmp(aliases[i].name, tkarray[1]) == 0){
 			foundAt = i;
 			found = true;	
 		}
 
-}
-if(found == true){	
-	for(int i = foundAt; i < amount-1; i++){
-		strcpy(aliases[i].name, aliases[i+1].name);
-		aliases[i].parameters = aliases[i+1].parameters;
+	}
+
+	if(found == true){	
+		for(int i = foundAt; i < amount-1; i++){
+			strcpy(aliases[i].name, aliases[i+1].name);
+			aliases[i].parameters = aliases[i+1].parameters;
 			for(int k = 0; k < aliases[i].parameters; k++){
 				strcpy(aliases[i].command[k], aliases[i+1].command[k]);
 			}
-    }
-}
+   		}
+	}	
 
-if(found == false){
-	printf("Error: No such alias exists.\n");
-	numAliases++;
-}
-
-else{ 
-	strcpy(aliases[amount-1].name, "\0");
-	aliases[amount-1].parameters = 0;
-	for(int j = 0; j < aliases[amount-1].parameters; j++){
-		strcpy(aliases[amount-1].command[j], "\0");
+	if(found == false){
+		printf("Error: No such alias exists.\n");
+		numAliases++;
+	} else { 
+		strcpy(aliases[amount-1].name, "\0");
+		aliases[amount-1].parameters = 0;
+		for(int j = 0; j < aliases[amount-1].parameters; j++){
+			strcpy(aliases[amount-1].command[j], "\0");
 
 	}
-	printf("alias successfully removed.\n");
+		printf("alias successfully removed.\n");
 }
 }
 
@@ -493,6 +448,7 @@ void readFile(char* fileName)
    	char string[512];
    	char* lines[20];
 	char* path = getenv("PATH");
+	char* histoken;
 	chdir(getenv("HOME")); //changes directory to home whenever history is read to ensure right file
 
   	FILE *fptr;
@@ -503,7 +459,8 @@ void readFile(char* fileName)
 	   	while(fgets(string, 512, fptr) != NULL){
 
 		   	//printf("%d. %s", i, string);
-		   	strcpy(history[i%historySize], string);
+			histoken = strtok (string, "\n"); //This removes new lines when adding to hist array
+		   	strcpy(history[i%historySize], histoken);
 		   	i++;
 		   	cmdcount++;
 		
