@@ -7,22 +7,20 @@
 #include <stdbool.h>
 
 void shell_loop();
-void getInput();
-int tokeniser();
-void newCmd(char*);
-int checkAlias();
-void checkCommands();
-int find_command(char []);
-void fork_command();
 void setpath(char []);
 void getpath();
-void writeToFile(char*, char*);
-void readFile(char*);
+void getInput();
+int tokeniser();
+void checkCommands();
+void newCmd(char*);
+void listHistory();
+void fork_command();
 void setAlias(int noTokens);
 void printAliases();
+int checkAlias();
 void unalias(int noTokens);
-void listHistory();
-
+void writeToFile(char*, char*);
+void readFile(char*);
 
 int running = 0; 					//keep program running 
 char *tkarray[512]; 					//array of tokens
@@ -271,7 +269,7 @@ void newCmd(char* inputcmd) {
 */
 void listHistory(){ 
 
-	if(cmdcount<20){ //this if statement displays the history without empty slots if <20 commands
+	if(cmdcount<20){ 
 		for(int i = 0, j = 1; i < cmdcount%(historySize) ; i++, j++){
        			printf("%d.%s\n", j, history[i]);
 		}
@@ -328,11 +326,12 @@ void setAlias(int noTokens){
 		}
 	}
 
-	if(numAliases < 10){//ensures we don't have more than ten aliases stored
+	//ensures that only 10 aliases can be stored at most
+	if(numAliases < 10){
 		strcpy(aliases[amount].name, tkarray[1]);
 		aliases[amount].parameters = noTokens-2;
 		printf("new alias: %s -> ", aliases[amount].name);
-		for(int i = 0; i <  aliases[amount].parameters; i++){ //copies all parameters of the aliased command
+		for(int i = 0; i <  aliases[amount].parameters; i++){ 
 			strcpy(aliases[amount].command[i], tkarray[i+2]);
 			printf("%s ", aliases[amount].command[i]);
 		}
@@ -422,9 +421,9 @@ void unalias(int noTokens){
 		for(int j = 0; j < aliases[amount-1].parameters; j++){
 			strcpy(aliases[amount-1].command[j], "\0");
 
-	}
+		}
 		printf("alias successfully removed.\n");
-}
+	}
 }
 
 /*
@@ -465,20 +464,12 @@ void readFile(char* fileName)
    	//checks if file exists then prints each line
    	if(fptr){
 	   	while(fgets(string, 512, fptr) != NULL){
-
-		   	//printf("%d. %s", i, string);
-			histoken = strtok (string, "\n"); //This removes new lines when adding to hist array
+			histoken = strtok (string, "\n");
 		   	strcpy(history[i%historySize], histoken);
 		   	i++;
 		   	cmdcount++;
-		
-
 	   	}
-
 		fclose(fptr);
 		chdir(path); //changes directory back again
    	}
-
-
-
 }
