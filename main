@@ -125,7 +125,6 @@ int tokeniser(){
 			tkarray[i] = '\0';
 	}
 
-	printf("tkarray is: %s", tkarray[0]);
 	strcpy(inputcpy, input); 			//makes a copy of input
 	token = strtok (input, " |><&;\t\n"); 		//creates the first token
 	
@@ -236,7 +235,8 @@ void checkCommands(){
 				numAliases++;
 			} else {
 				printf("Error: Maximum number of aliases has been reached. unable to add alias.\n");
-			} else if(nt == 1){//prints list of aliases
+			}
+		} else if(nt == 1){//prints list of aliases
 				printAliases();
 			} else { 
 				printf("Error: incorrect number of parameters for alias command.\n");
@@ -252,7 +252,6 @@ void checkCommands(){
 			fork_command();
 		}
 	}	
-}
 
 /*
 	Add the new command to the history array
