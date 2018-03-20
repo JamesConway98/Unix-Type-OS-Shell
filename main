@@ -14,6 +14,7 @@ int tokeniser();
 void checkCommands();
 void newCmd(char*);
 void listHistory();
+void clearHistory();
 void fork_command();
 void setAlias(int noTokens);
 void printAliases();
@@ -223,7 +224,7 @@ void checkCommands(){
 			printf("Error: incorrect number of parameters. Setpath requires one argument. \n");
 		}
 	} else if(strcmp(tkarray[0], "history") == 0){ //Command displays history list
-		if(nt == 1){ //takes one parameter
+		if(nt == 1){
 			listHistory();
 		} else {
 			printf("Error: History command doesn't take parameters\n");		
@@ -241,18 +242,19 @@ void checkCommands(){
 			} else { 
 				printf("Error: incorrect number of parameters for alias command.\n");
 			}
-		} else if(strcmp(tkarray[0], "unalias") == 0){//removes alias
+	} else if(strcmp(tkarray[0], "unalias") == 0){//removes alias
 			if(nt == 2){
 				unalias(nt);
 				numAliases--;
 			} else {
 				printf("Error: incorrect number of parameters for the unalias command.\n");
 			}
-		} else {
+	} else if((strcmp(tkarray[0], "clear") ==0) && (strcmp(tkarray[1], "history") == 0)){
+		clearHistory();
+	} else {
 			fork_command();
-		}
-	}	
-
+		}	
+}
 /*
 	Add the new command to the history array
 */
@@ -283,6 +285,17 @@ void listHistory(){
 			}
 			i = (i+1)%historySize;		
 		}while (i!=cmdcount%historySize);
+	}
+}
+
+
+/*
+	clears the history 
+*/
+void clearHistory(){ 
+
+	for(int i = 0; i<20; i++){
+		history[i] == NULL;
 	}
 }
 
