@@ -8,7 +8,7 @@
 
 void shell_loop();
 void getInput();
-void tokeniser();
+int tokeniser();
 void newCmd(char*);
 int checkAlias();
 void checkCommands();
@@ -63,9 +63,8 @@ numAliases = 0;
     while(running == 0){
     	printf(":) ");
 	getInput();
-	tokeniser();
-	checkCommands(); //checks the input for list of commands
-    }   
+	
+	 }   
 
 }
 
@@ -100,10 +99,10 @@ void getInput(){
 	}
 
 	input[strlen(input)-1] = '\0'; //adds null to end of input string
-
+tokeniser();
 }	
 
-void tokeniser(){
+int tokeniser(){
 
     int aliasFound = 0;
 	nt = 0;
@@ -112,6 +111,7 @@ void tokeniser(){
 			tkarray[i] = '\0';
 
 	}
+printf("tkarray is: %s", tkarray[0]);
 	
 
 	char inputcpy[512];
@@ -124,8 +124,8 @@ void tokeniser(){
 	token = strtok (input, " |><&;\t\n"); //creates the first token
 	
 	
-	if (token == NULL){ //if input is enter key, returns to start of loop
-		return;
+	if (token == NULL){ //if input is enter key, returns to start of loop	
+		return 0;
 	}
 	
 	
@@ -133,6 +133,7 @@ void tokeniser(){
 	
 	//adjusts nt variable for any aliased parameters
 	aliasFound = checkAlias();
+
 	if(aliasFound > 0){
 	nt = nt + aliasFound;
 	}
@@ -153,37 +154,59 @@ void tokeniser(){
 	
 	tkarray[nt] = NULL; //sets the last token to null
 
-	if(strcmp(tkarray[0], "!!") == 0 && nt == 1){
-		printf("found command\n");
-		strcpy(input, history[(cmdcount%historySize)-1]);
-		}
-	
 
+if(strncmp(tkarray[0], "!", 1)==0){
 
-	else if(strcspn(tkarray[0], "!-") == 1 && nt = 1){ //history invokation. MUST BE ABOVE CHECKCOMMANDS
+	if(strncmp(tkarray[0], "!!", 2)==0){
+
+		//printf("command in history: %s\n", history[cmdcount%historySize-1]);
+		//strcpy(inputcpy, history[cmdcount%historySize-1]);
+	//printf("command in tk array: %s\n", tkarray[0]);
+	strcpy(input, history[cmdcount%historySize-1]);
+	tokeniser();
+	//printf("command in tk array: %s\n", tkarray[0]);
+	return 0;
+
+	}
+	else if(strncmp(tkarray[0], "!-", 2)==0){
+		char num[2];
+		int number = 0;
+		strncpy(num, tkarray[0]+2, 2);
+		number = atoi(num);
+		//printf("command in history: %s\n", history[cmdcount%historySize-1-number]);
+			strcpy(input, history[cmdcount%historySize-1-number]);
+		tokeniser();
+		return 0;
 		
-		int histnum = atoi(tkarray[1]);
-
-		printf("%d\n", histnum);
-		strcpy(input, history[histnum-1]);
-		printf("%s\n", input);
-		//tokeniser(input);
-		printf("This shouldnt show");
-		}
-
-		//else{
-			//do a thing as well		
-		//}
-	else{
-		newCmd(inputcpy);	//This adds the input to the history of commands
+	
 	}
 
+	else{//used when !<no> is entered
+		char num[2];
+		int number = 0;
+		strncpy(num, tkarray[0]+1, 2);
+		number = atoi(num);
+		printf("command in history: %s\n", history[cmdcount%historySize-21+number]);
+		strcpy(input, history[cmdcount%historySize-21+number]);
+	//strcpy(history[cmdcount%historySize-21+number], inputcpy);
+	printf("command in tk array: %s\n", inputcpy);
+		tokeniser();
+	printf("command in tk array the second: %s\n", tkarray[0]);
+		return 0;
+	}
+}
 
+else{
+	newCmd(inputcpy);
+}
+checkCommands(); //checks the input for list of commands
+return 0;
 
-
+   
 
 }
 void checkCommands(){
+	printf("command for execution: %s\n", tkarray[0]);
     
 	if(strcmp(tkarray[0], "exit") == 0){ //closes the shell
 		
@@ -297,7 +320,7 @@ void listHistory(){ //this function calls and displays the history
 
 	if(cmdcount<20){ //this if statement displays the history without empty slots if <20 commands
 		for(int i = 0, j = 1; i < cmdcount%(historySize) ; i++, j++)
-       		printf("%d.%s \n", (j), history[i]);
+       		printf("%d.%s\n", j, history[i]);
 	}
 	else{ //this is used to correctly display the circular array
 		int number = 1;
@@ -308,8 +331,11 @@ void listHistory(){ //this function calls and displays the history
 				number++;
 			}
 			i = (i+1)%historySize;		//increments i++ in the circular array
-		}while (i!=cmdcount%historySize);	//then loops to the beginning before 								returning to cmdcount
+		}while (i!=cmdcount%historySize);
+
+//then loops to the beginning before returning to cmdcount
 	}
+
 
 }
 
@@ -446,8 +472,6 @@ else{
 }
 }
 
-
-
 void writeToFile(char* fileName, char* text)
 {
    	char* path = getenv("PATH");
@@ -489,5 +513,7 @@ void readFile(char* fileName)
 		fclose(fptr);
 		chdir(path); //changes directory back again
    	}
+
+
 
 }
