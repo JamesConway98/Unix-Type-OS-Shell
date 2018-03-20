@@ -427,6 +427,10 @@ void unalias(int noTokens){
 }
 }
 
+/*
+    Writes text from argument to File 
+*/
+
 void writeToFile(char* fileName, char* text)
 {
    	char* path = getenv("PATH");
@@ -441,6 +445,10 @@ void writeToFile(char* fileName, char* text)
 	chdir(path); //changes directory back again
 }
 
+
+/*
+    Reads the history from the file that is passed in as an argument to the history array 
+*/
 void readFile(char* fileName)
 {
    
