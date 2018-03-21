@@ -294,9 +294,31 @@ void listHistory(){
 */
 void clearHistory(){ 
 
+
+
+	char* path = getenv("PATH");
+	chdir(getenv("HOME")); //changes directory to home whenever history is cleared to ensure right file
+
+
+	
+  	FILE *fptr;
+   	fptr = fopen(".hist_list.txt","w"); //writing nothing to file will clear it
+
+   	//checks if file exists then closes
+   	if(fptr){
+		fclose(fptr);
+   	}
+	
+	chdir(path); //changes directory back again
+
+	
+	
 	for(int i = 0; i<20; i++){
 		history[i] == NULL;
 	}
+	
+	cmdcount = 0; //reset history command count
+	
 }
 
 /*
@@ -485,3 +507,4 @@ void readFile(char* fileName)
 		chdir(path); //changes directory back again
    	}
 }
+
