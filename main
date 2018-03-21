@@ -249,9 +249,10 @@ void checkCommands(){
 			} else {
 				printf("Error: incorrect number of parameters for the unalias command.\n");
 			}
-	} else if((strcmp(tkarray[0], "clear") ==0) && (strcmp(tkarray[1], "history") == 0)){
+	} else if((strcmp(tkarray[0], "clear") ==0) && nt == 2){
+		if(strcmp(tkarray[1], "history") == 0){
 		clearHistory();
-	} else {
+	}else {
 			fork_command();
 		}	
 }
