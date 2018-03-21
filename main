@@ -323,7 +323,7 @@ void clearHistory(){
 }
 
 /*
-
+ runs any commands then have not been internally programmed
 */
 void fork_command(){
 
@@ -342,7 +342,7 @@ void fork_command(){
 }
 
 /*
-
+  adds an alias to list, eg alias a b means in the future when you type a, b happens
 */
 void setAlias(int noTokens){
 
@@ -379,7 +379,7 @@ void setAlias(int noTokens){
 }
 
 /*
-
+outputs list of all aliases to screen
 */
 void printAliases(){
 
@@ -401,7 +401,7 @@ void printAliases(){
 }
 
 /*
-
+checks to saee if the first token is an alias for something else
 */
 int checkAlias(){
 
@@ -421,7 +421,7 @@ int checkAlias(){
 }
 
 /*
-
+  removes an alias from the list
 */
 void unalias(int noTokens){
 
